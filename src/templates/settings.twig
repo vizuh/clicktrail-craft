@@ -1,0 +1,63 @@
+{% import '_includes/forms.twig' as forms %}
+
+{{ forms.textField({
+    label: 'Site ID'|t('clicktrail'),
+    instructions: 'Identifies this site in your ClickTrail endpoint.'|t('clicktrail'),
+    id: 'siteId',
+    name: 'siteId',
+    value: settings.siteId,
+}) }}
+
+{{ forms.textField({
+    label: 'Endpoint URL'|t('clicktrail'),
+    instructions: 'ClickTrail ingestion endpoint that receives event payloads.'|t('clicktrail'),
+    id: 'endpoint',
+    name: 'endpoint',
+    value: settings.endpoint,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Require consent'|t('clicktrail'),
+    instructions: 'Only capture and persist attribution while the host consent state permits it.'|t('clicktrail'),
+    id: 'consentRequired',
+    name: 'consentRequired',
+    on: settings.consentRequired,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'First-party proxy'|t('clicktrail'),
+    instructions: 'Serve the first-party ClickTrail loader from this site\'s own domain.'|t('clicktrail'),
+    id: 'firstPartyProxy',
+    name: 'firstPartyProxy',
+    on: settings.firstPartyProxy,
+}) }}
+
+<h2>{{ 'Event mapping'|t('clicktrail') }}</h2>
+
+{{ forms.lightswitchField({
+    label: 'Form submissions → lead.submitted'|t('clicktrail'),
+    id: 'mapFormSubmissions',
+    name: 'mapFormSubmissions',
+    on: settings.mapFormSubmissions,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'User registrations → lead.submitted'|t('clicktrail'),
+    id: 'mapUserRegistrations',
+    name: 'mapUserRegistrations',
+    on: settings.mapUserRegistrations,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Commerce orders completed → sale.completed'|t('clicktrail'),
+    id: 'mapCommerceOrders',
+    name: 'mapCommerceOrders',
+    on: settings.mapCommerceOrders,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Order refunds → sale.refunded'|t('clicktrail'),
+    id: 'mapRefunds',
+    name: 'mapRefunds',
+    on: settings.mapRefunds,
+}) }}

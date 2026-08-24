@@ -1,0 +1,36 @@
+{
+    "name": "vizuh/craft-clicktrail",
+    "description": "Attribution connector for Craft Forms and Commerce - see which campaign, keyword, click ID and landing page created each submission, customer and order.",
+    "type": "craft-plugin",
+    "license": "MIT",
+    "keywords": [
+        "attribution",
+        "utm",
+        "gclid",
+        "analytics",
+        "marketing",
+        "craftcms",
+        "commerce"
+    ],
+    "require": {
+        "php": ">=8.2",
+        "craftcms/cms": "^5.0",
+        "clicktrail/php-sdk": "dev-main"
+    },
+    "autoload": {
+        "psr-4": {
+            "ClickTrail\\Craft\\": "src/"
+        }
+    },
+    "extra": {
+        "handle": "clicktrail",
+        "name": "ClickTrail",
+        "developer": "Vizuh OU",
+        "developerUrl": "https://vizuh.com",
+        "documentationUrl": "https://github.com/vizuh/clicktrail-craft/blob/main/README.md",
+        "class": "ClickTrail\\Craft\\Plugin",
+        "bundles": [
+            "ClickTrail\\Craft"
+        ]
+    }
+}
