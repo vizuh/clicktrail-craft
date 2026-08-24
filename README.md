@@ -56,7 +56,10 @@ All options live on the plugin settings page (Settings -> ClickTrail):
 |---|---|---|
 | Site ID | empty | Identifies this site in your ClickTrail endpoint |
 | Endpoint URL | empty | Where payloads are POSTed |
-| Require consent | off | Only capture/persist when host consent state permits |
+| Consent resolver class | empty | Custom `ConsentResolverInterface` implementation returning the normalized snapshot; empty = all signals "unknown" |
+| Attribution persistence requires `analytics_storage` | on | Gate attribution storage on granted analytics consent |
+| Ad click-ID storage requires `advertising_storage` | on | Gate ad click-ID (gclid, fbclid, ...) storage on granted advertising consent |
+| Send hashed lead data to ad destinations (`ad_user_data`) | off | Additional gate for hashed-lead forwarding; still needs `ad_user_data` granted |
 | First-party proxy | off | Serve the ClickTrail loader from your own domain |
 | Map form submissions | on | Emit `lead.submitted` on form submits |
 | Map user registrations | on | Emit `lead.submitted` on registration |
@@ -73,6 +76,25 @@ All options live on the plugin settings page (Settings -> ClickTrail):
 {# canonical payload for the current visitor #}
 <pre>{{ clicktrail.payload('page_view') | json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
 ```
+
+## Consent
+
+ClickTrail does not replace your consent platform - it obeys it. The full
+normalized consent contract (capabilities, snapshot shape, behavior matrix)
+lives in [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md).
+
+- Provider: auto-detect through a custom resolver class. WordPress ClickTrail
+  builds read WP Consent API directly; on Craft, implement
+  `ClickTrail\\Craft\\Services\\Consent\\ConsentResolverInterface`
+  (returns the current `ClickTrail\\Consent\\ConsentSnapshot`) and point
+  the plugin setting at it. Real CMP adapters are deferred.
+- Attribution persistence requires `analytics_storage`; ad click-ID storage
+  requires `advertising_storage`; hashed-lead forwarding additionally needs an
+  explicit granted `ad_user_data` signal (disabled by default).
+- On unknown consent: **do not store or send**. Suppressed actions are recorded
+  with `suppressionReason()` into diagnostics.
+- The resolved consent snapshot is persisted alongside the attribution state and
+  travels with every submission (`consent` key on each payload).
 
 ## License
 

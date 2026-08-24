@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ClickTrail\Craft\Services;
 
+use ClickTrail\Consent\ConsentSnapshot;
+use ClickTrail\Conventions\Stable;
 use ClickTrail\Core\AttributionInput;
 use ClickTrail\Core\PayloadSerializer;
 use ClickTrail\Core\StoredState;
@@ -16,6 +18,12 @@ use craft\base\Component;
  * Session-backed adapter around the deterministic php-sdk core.
  * All parse/classify/merge/serialize logic lives in ClickTrail\Core\*;
  * this service only supplies effects: request input, session persistence.
+ *
+ * Consent contract: attribution persistence requires analytics_storage and
+ * ad click-ID storage requires advertising_storage (per settings); on
+ * denied/unknown nothing is stored or sent and the reason lands in
+ * diagnostics. The resolved ConsentSnapshot is persisted alongside the
+ * attribution state and attached to every payload under "consent".
  */
 class AttributionService extends Component
 {
@@ -34,8 +42,19 @@ class AttributionService extends Component
             return $stored;
         }
 
+        if (!ConsentGate::allows(ConsentSnapshot::CAP_ANALYTICS)) {
+            // Unknown/denied analytics consent: do not store or send.
+            return StoredState::empty();
+        }
+
+        $query = (array) $request->getQueryParams();
+        if (!ConsentGate::allows(ConsentSnapshot::CAP_ADVERTISING_STORAGE)) {
+            // Ad click-ID keys are stripped before they can be persisted.
+            $query = array_diff_key($query, array_fill_keys(Stable::CLICK_ID_KEYS, true));
+        }
+
         $input = new AttributionInput(
-            query: (array) $request->getQueryParams(),
+            query: $query,
             host: (string) $request->hostName,
             landingPage: $request->absoluteUrl,
             referrer: $request->referrer,
@@ -44,6 +63,7 @@ class AttributionService extends Component
 
         $merged = TouchMerger::observe($stored, $input);
         $this->persist($merged);
+        ConsentGate::resolve();
 
         return $merged;
     }
@@ -81,13 +101,21 @@ class AttributionService extends Component
     {
         $settings = \ClickTrail\Craft\Plugin::getInstance()->getSettings();
 
+        if (!ConsentGate::allows(ConsentSnapshot::CAP_ANALYTICS)) {
+            // Suppressed before queueing; reason already in diagnostics.
+            // Future hashed-lead forwarding must also pass
+            // ConsentGate::hashedLeadForwardingAllowed() (ad_user_data).
+            return [];
+        }
+
         $attribution = $this->captureRequest();
+        ConsentGate::resolve();
 
         return (new PayloadSerializer())->serialize(
             siteId: (string) ($settings->siteId ?? ''),
             event: ['name' => $eventName] + $event,
             attribution: $attribution,
-            extra: $extra,
+            extra: $extra + ['consent' => json_decode(ConsentGate::resolve()->toJson(), true)],
         );
     }
 }

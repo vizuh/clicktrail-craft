@@ -16,13 +16,45 @@
     value: settings.endpoint,
 }) }}
 
-{{ forms.lightswitchField({
-    label: 'Require consent'|t('clicktrail'),
-    instructions: 'Only capture and persist attribution while the host consent state permits it.'|t('clicktrail'),
-    id: 'consentRequired',
-    name: 'consentRequired',
-    on: settings.consentRequired,
+<h2>{{ 'Consent integration'|t('clicktrail') }}</h2>
+
+<p class="light">{{ 'Provider: auto-detect through the resolver hook below. ClickTrail never acts as a CMP - your consent platform owns the banner and the decision; this plugin obeys it (see docs/consent-compatibility-plan.md). WordPress builds read the WP Consent API directly.'|t('clicktrail') }}</p>
+
+{{ forms.textField({
+    label: 'Consent resolver class'|t('clicktrail'),
+    instructions: 'Optional class implementing ClickTrail\\Craft\\Services\\Consent\\ConsentResolverInterface that returns the current normalized ConsentSnapshot from your CMP. Leave empty to run with every signal "unknown". Real CMP adapters are deferred.'|t('clicktrail'),
+    id: 'consentResolverClass',
+    name: 'consentResolverClass',
+    value: settings.consentResolverClass,
 }) }}
+
+{{ forms.lightswitchField({
+    label: 'Attribution persistence requires analytics_storage'|t('clicktrail'),
+    instructions: 'When enabled, first-touch/last-touch attribution is only persisted while analytics_storage consent is granted.'|t('clicktrail'),
+    id: 'requireAnalyticsStorage',
+    name: 'requireAnalyticsStorage',
+    on: settings.requireAnalyticsStorage,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Ad click-ID storage requires advertising_storage'|t('clicktrail'),
+    instructions: 'When enabled, ad click IDs (gclid, fbclid, msclkid, ...) are only stored while advertising_storage consent is granted.'|t('clicktrail'),
+    id: 'requireAdvertisingStorage',
+    name: 'requireAdvertisingStorage',
+    on: settings.requireAdvertisingStorage,
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Send hashed lead data to ad destinations (ad_user_data)'|t('clicktrail'),
+    instructions: 'Disabled by default. When enabled, hashed-lead forwarding still requires an explicit granted ad_user_data signal.'|t('clicktrail'),
+    id: 'forwardHashedLeadData',
+    name: 'forwardHashedLeadData',
+    on: settings.forwardHashedLeadData,
+}) }}
+
+<p class="light"><strong>{{ 'On unknown consent: do not store or send.'|t('clicktrail') }}</strong> {{ 'Unknown is treated as denied everywhere. Suppressed actions are recorded with a reason in diagnostics, and the consent snapshot travels with every submission.'|t('clicktrail') }}</p>
+
+<h2>{{ 'General'|t('clicktrail') }}</h2>
 
 {{ forms.lightswitchField({
     label: 'First-party proxy'|t('clicktrail'),

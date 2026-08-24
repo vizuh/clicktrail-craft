@@ -6,6 +6,11 @@ namespace ClickTrail\Craft\Models;
 
 use craft\base\Model;
 
+/**
+ * Consent contract (docs/consent-compatibility-plan.md): capability toggles
+ * decide which use requires which signal; unknown consent stores and sends
+ * nothing. The plugin never acts as a CMP.
+ */
 class Settings extends Model
 {
     /** Site identifier sent with every payload. */
@@ -14,8 +19,22 @@ class Settings extends Model
     /** ClickTrail ingestion endpoint URL. */
     public ?string $endpoint = null;
 
-    /** When true, capture/persist only while host consent state permits. */
-    public bool $consentRequired = false;
+    /**
+     * Optional custom resolver class implementing
+     * ConsentResolverInterface (returns the current normalized snapshot).
+     * Empty = all signals "unknown". Real CMP adapters are deferred;
+     * WordPress builds read WP Consent API directly.
+     */
+    public ?string $consentResolverClass = null;
+
+    /** Attribution persistence requires granted analytics_storage. */
+    public bool $requireAnalyticsStorage = true;
+
+    /** Ad click-ID storage requires granted advertising_storage. */
+    public bool $requireAdvertisingStorage = true;
+
+    /** Hashed-lead forwarding gate; when enabled still needs ad_user_data granted. */
+    public bool $forwardHashedLeadData = false;
 
     /** Serve the first-party loader/proxy from this site's own domain. */
     public bool $firstPartyProxy = false;
@@ -29,10 +48,11 @@ class Settings extends Model
     public function defineRules(): array
     {
         return [
-            [['siteId', 'endpoint'], 'string'],
+            [['siteId', 'endpoint', 'consentResolverClass'], 'string'],
             [['endpoint'], 'url', 'defaultScheme' => 'https'],
             [['endpoint'], 'required'],
-            [['consentRequired', 'firstPartyProxy',
+            [['requireAnalyticsStorage', 'requireAdvertisingStorage', 'forwardHashedLeadData',
+              'firstPartyProxy',
               'mapFormSubmissions', 'mapUserRegistrations',
               'mapCommerceOrders', 'mapRefunds'], 'boolean'],
         ];

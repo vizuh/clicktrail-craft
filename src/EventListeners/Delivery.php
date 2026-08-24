@@ -18,6 +18,11 @@ class Delivery
     {
         $settings = \ClickTrail\Craft\Plugin::getInstance()->getSettings();
 
+        if (empty($payload)) {
+            // buildPayload returns [] when consent suppresses the event.
+            return;
+        }
+
         if (empty($settings->endpoint)) {
             return;
         }
