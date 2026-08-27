@@ -4,7 +4,8 @@ English | [Português](README.pt-BR.md) | [Deutsch](README.de.md) | [中文](REA
 
 **vizuh/craft-clicktrail**
 
-See which campaign, keyword, click ID and landing page created each form submission, customer and Commerce order in Craft CMS.
+Carry observed acquisition context into configured Craft Forms, user, and
+Commerce event payloads.
 
 </div>
 
@@ -27,9 +28,14 @@ See which campaign, keyword, click ID and landing page created each form submiss
 
 ## Why
 
-Not another analytics script. ClickTrail attaches deterministic first-touch / last-touch attribution to every lead and sale your Craft site produces and ships it server-side to your ClickTrail endpoint — so the answer to "where did this customer come from?" lives next to the record, not in a separate dashboard.
+This connector reads stored first-touch and last-touch context and builds
+canonical payloads for configured Craft form, registration, and Commerce
+events. It does not determine which campaign caused a lead or sale. Delivery
+remains subject to the transport limits documented below.
 
-Attribution logic is never reimplemented here; the shared [`clicktrail/php-sdk`](https://github.com/vizuh/clicktrail-php) core computes every payload.
+Attribution logic is not reimplemented here. The shared
+[`clicktrail/php-sdk`](https://github.com/vizuh/clicktrail-php) core computes
+each payload.
 
 Requires Craft CMS 5.0+ and PHP 8.2+. Optional: the Craft Forms plugin (form submissions) and Craft Commerce (orders).
 
@@ -51,7 +57,7 @@ Read attribution directly in any site template:
 
 ```twig
 {{ clicktrail.attribution.first.source }}
-{# "google" right after a paid-search landing —
+{# "google" right after a paid-search landing;
    and still "google" after any number of later direct visits #}
 
 <pre>{{ clicktrail.payload('page_view') | json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
@@ -59,7 +65,10 @@ Read attribution directly in any site template:
    consent snapshot included. Renders [] when analytics consent is unknown/denied. #}
 ```
 
-A visitor arrives from a Google Ads ad, registers, then completes a Commerce order. Your ClickTrail endpoint receives three canonical events — `lead_created`, `lead_created`, `sale` — each stamped with the same immutable first touch (`attribution.first.source === 'google'`, click ID preserved) plus the last touch at event time.
+A configured journey from arrival to registration and Commerce order can build
+three canonical events: `lead_created`, `lead_created`, and `sale`. Each payload
+includes the observed first touch plus the last touch at event time. Delivery
+success depends on the configured endpoint and the transport limits below.
 
 ## Event mapping
 
@@ -94,7 +103,7 @@ All options live on the plugin settings page (Settings → ClickTrail):
 
 ## Consent
 
-ClickTrail does not replace your consent platform — it obeys it. The normalized consent contract (capabilities, snapshot shape, behavior matrix) lives in [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md).
+ClickTrail does not replace your consent platform; it obeys it. The normalized consent contract (capabilities, snapshot shape, behavior matrix) lives in [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md).
 
 - Provider: implement `ClickTrail\Craft\Services\Consent\ConsentResolverInterface` (returns the current `ClickTrail\Consent\ConsentSnapshot`) and point the plugin setting at it. Real CMP adapters are deferred; the WordPress plugin reads WP Consent API directly.
 - On unknown consent: **do not store or send**. Suppressed actions are recorded with `suppressionReason()` into diagnostics.
@@ -118,4 +127,4 @@ GitHub Actions CI lints all PHP files on every push ([workflow](https://github.c
 
 ## License
 
-MIT — Copyright (c) 2026 Vizuh OÜ. See [LICENSE](LICENSE).
+MIT; Copyright (c) 2026 Vizuh OÜ. See [LICENSE](LICENSE).

@@ -4,7 +4,8 @@ English | [Português](README.pt-BR.md) | [Deutsch](README.de.md) | [中文](REA
 
 **vizuh/craft-clicktrail**
 
-Veja qual campanha, palavra-chave, click ID e página de destino gerou cada envio de formulário, cliente e pedido do Commerce no Craft CMS.
+Leve o contexto de aquisição observado aos payloads configurados de Craft
+Forms, usuários e eventos do Commerce.
 
 </div>
 
@@ -27,9 +28,15 @@ Veja qual campanha, palavra-chave, click ID e página de destino gerou cada envi
 
 ## Por quê
 
-Não é mais um script de analytics. O ClickTrail anexa atribuição determinística de primeiro/último toque a cada lead e venda que seu site Craft produz e envia server-side ao seu endpoint ClickTrail — assim a resposta para "de onde veio este cliente?" fica junto do registro, não num painel separado.
+Este connector lê o contexto armazenado de primeiro e último toque e cria
+payloads canônicos para eventos configurados de formulários, registros de
+usuário e Commerce no Craft. Ele não determina qual campanha causou um lead ou
+uma venda. A entrega continua sujeita aos limites de transporte documentados
+abaixo.
 
-A lógica de atribuição nunca é reimplementada aqui; o núcleo compartilhado [`clicktrail/php-sdk`](https://github.com/vizuh/clicktrail-php) calcula cada payload.
+A lógica de atribuição não é reimplementada aqui. O núcleo compartilhado
+[`clicktrail/php-sdk`](https://github.com/vizuh/clicktrail-php) calcula cada
+payload.
 
 Requer Craft CMS 5.0+ e PHP 8.2+. Opcional: o plugin Craft Forms (envios de formulário) e o Craft Commerce (pedidos).
 
@@ -51,7 +58,7 @@ Leia a atribuição diretamente em qualquer template do site:
 
 ```twig
 {{ clicktrail.attribution.first.source }}
-{# "google" logo após uma landing de pesquisa paga —
+{# "google" logo após uma landing de pesquisa paga;
    e continua "google" depois de quantas visitas diretas forem #}
 
 <pre>{{ clicktrail.payload('page_view') | json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
@@ -60,7 +67,11 @@ Leia a atribuição diretamente em qualquer template do site:
    de analytics está unknown/denied. #}
 ```
 
-Um visitante chega por um anúncio do Google Ads, se registra e conclui um pedido no Commerce. Seu endpoint ClickTrail recebe três eventos canônicos — `lead_created`, `lead_created`, `sale` — cada um carimbado com o mesmo primeiro toque imutável (`attribution.first.source === 'google'`, click ID preservado) mais o último toque no momento do evento.
+Uma jornada configurada da chegada ao registro e ao pedido do Commerce pode
+criar três eventos canônicos: `lead_created`, `lead_created` e `sale`. Cada
+payload inclui o primeiro toque observado e o último toque no momento do
+evento. O sucesso da entrega depende do endpoint configurado e dos limites de
+transporte abaixo.
 
 ## Mapeamento de eventos
 
@@ -95,7 +106,7 @@ Todas as opções ficam na página de configurações do plugin (Configurações
 
 ## Consentimento
 
-O ClickTrail não substitui sua plataforma de consentimento — ele a obedece. O contrato normalizado de consentimento (capacidades, formato do snapshot, matriz de comportamento) está em [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md).
+O ClickTrail não substitui sua plataforma de consentimento; ele a obedece. O contrato normalizado de consentimento (capacidades, formato do snapshot, matriz de comportamento) está em [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md).
 
 - Provedor: implemente `ClickTrail\Craft\Services\Consent\ConsentResolverInterface` (retorna o `ClickTrail\Consent\ConsentSnapshot` atual) e aponte a configuração do plugin para ela. Adaptadores reais de CMP estão adiados; o plugin WordPress lê a WP Consent API diretamente.
 - Com consentimento desconhecido: **não armazenar nem enviar**. Ações suprimidas são registradas com `suppressionReason()` nos diagnósticos.
@@ -119,4 +130,4 @@ O CI no GitHub Actions faz lint de todos os arquivos PHP a cada push ([workflow]
 
 ## Licença
 
-MIT — Copyright (c) 2026 Vizuh OÜ. Consulte [LICENSE](LICENSE).
+MIT; Copyright (c) 2026 Vizuh OÜ. Consulte [LICENSE](LICENSE).

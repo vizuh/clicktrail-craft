@@ -4,7 +4,8 @@ English | [Português](README.pt-BR.md) | [Deutsch](README.de.md) | [中文](REA
 
 **vizuh/craft-clicktrail**
 
-Sehen Sie, welche Kampagne, welches Keyword, welche Click-ID und welche Landingpage jede Formular-Übermittlung, jeden Kunden und jede Commerce-Bestellung in Craft CMS erzeugt hat.
+Übertragen Sie beobachteten Akquisitionskontext in konfigurierte Payloads für
+Craft Forms, Benutzer und Commerce-Events.
 
 </div>
 
@@ -27,9 +28,15 @@ Sehen Sie, welche Kampagne, welches Keyword, welche Click-ID und welche Landingp
 
 ## Warum
 
-Wieder kein Analytics-Skript. ClickTrail hängt an jeden Lead und jede Verkaufstransaktion, die Ihre Craft-Seite erzeugt, deterministische First-touch-/Last-touch-Attribution und liefert sie serverseitig an Ihren ClickTrail-Endpoint — damit die Antwort auf „Woher kommt dieser Kunde?" direkt am Datensatz liegt, nicht in einem separaten Dashboard.
+Dieser Connector liest gespeicherten First-Touch- und Last-Touch-Kontext und
+erstellt kanonische Payloads für konfigurierte Craft-Formular-, Benutzer- und
+Commerce-Events. Er bestimmt nicht, welche Kampagne einen Lead oder Verkauf
+verursacht hat. Für die Zustellung gelten die unten dokumentierten
+Transportgrenzen.
 
-Die Attributionslogik wird hier nie neu implementiert; der gemeinsame Kern [`clicktrail/php-sdk`](https://github.com/vizuh/clicktrail-php) berechnet jedes Payload.
+Die Attributionslogik wird hier nicht neu implementiert. Der gemeinsame Kern
+[`clicktrail/php-sdk`](https://github.com/vizuh/clicktrail-php) berechnet jedes
+Payload.
 
 Benötigt Craft CMS 5.0+ und PHP 8.2+. Optional: das Craft-Forms-Plugin (Formular-Übermittlungen) und Craft Commerce (Bestellungen).
 
@@ -51,7 +58,7 @@ Lesen Sie die Attribution direkt in jedem Site-Template:
 
 ```twig
 {{ clicktrail.attribution.first.source }}
-{# "google" direkt nach einer Paid-Search-Landingpage —
+{# "google" direkt nach einer Paid-Search-Landingpage;
    und weiterhin "google" nach beliebig vielen späteren Direktbesuchen #}
 
 <pre>{{ clicktrail.payload('page_view') | json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
@@ -59,7 +66,11 @@ Lesen Sie die Attribution direkt in jedem Site-Template:
    Consent-Snapshot inklusive. Rendert [], wenn Analytics-Consent unknown/denied ist. #}
 ```
 
-Ein Besucher kommt über eine Google-Ads-Anzeige, registriert sich und schließt eine Commerce-Bestellung ab. Ihr ClickTrail-Endpoint erhält drei kanonische Events — `lead_created`, `lead_created`, `sale` — jedes gestempelt mit demselben unveränderlichen First Touch (`attribution.first.source === 'google'`, Click-ID erhalten) plus dem Last Touch zum Event-Zeitpunkt.
+Eine konfigurierte Journey von der Ankunft über die Registrierung bis zur
+Commerce-Bestellung kann drei kanonische Events erzeugen: `lead_created`,
+`lead_created` und `sale`. Jedes Payload enthält den beobachteten First Touch
+und den Last Touch zum Event-Zeitpunkt. Der Zustellungserfolg hängt vom
+konfigurierten Endpoint und den unten beschriebenen Transportgrenzen ab.
 
 ## Event-Mapping
 
@@ -94,7 +105,7 @@ Alle Optionen finden Sie auf der Plugin-Einstellungsseite (Einstellungen → Cli
 
 ## Consent
 
-ClickTrail ersetzt Ihre Consent-Plattform nicht — es gehorcht ihr. Der normalisierte Consent-Vertrag (Capabilities, Snapshot-Form, Verhaltensmatrix) liegt in [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md).
+ClickTrail ersetzt Ihre Consent-Plattform nicht; es gehorcht ihr. Der normalisierte Consent-Vertrag (Capabilities, Snapshot-Form, Verhaltensmatrix) liegt in [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md).
 
 - Anbieter: Implementieren Sie `ClickTrail\Craft\Services\Consent\ConsentResolverInterface` (liefert den aktuellen `ClickTrail\Consent\ConsentSnapshot`) und verweisen Sie die Plugin-Einstellung darauf. Echte CMP-Adapter sind zurückgestellt; das WordPress-Plugin liest direkt die WP Consent API.
 - Bei unbekanntem Consent: **nichts speichern oder senden**. Unterdrückte Aktionen werden mit `suppressionReason()` in der Diagnostik protokolliert.
@@ -118,4 +129,4 @@ CI in GitHub Actions lintet bei jedem Push alle PHP-Dateien ([Workflow](https://
 
 ## Lizenz
 
-MIT — Copyright (c) 2026 Vizuh OÜ. Siehe [LICENSE](LICENSE).
+MIT; Copyright (c) 2026 Vizuh OÜ. Siehe [LICENSE](LICENSE).

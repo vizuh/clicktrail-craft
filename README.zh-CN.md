@@ -4,7 +4,7 @@ English | [Português](README.pt-BR.md) | [Deutsch](README.de.md) | [中文](REA
 
 **vizuh/craft-clicktrail**
 
-看清是哪个广告系列、哪个关键词、哪个点击 ID 和哪个落地页带来了 Craft CMS 的每一次表单提交、每一位客户和每一个 Commerce 订单。
+将观测到的获客上下文附加到已配置的 Craft Forms、用户和 Commerce 事件 payload 中。
 
 </div>
 
@@ -27,9 +27,9 @@ English | [Português](README.pt-BR.md) | [Deutsch](README.de.md) | [中文](REA
 
 ## 为什么
 
-不是又一个分析脚本。ClickTrail 会为你的 Craft 站点产生的每一条线索和每一笔销售附加确定性的首次/末次触点归因，并以服务端方式发送到你的 ClickTrail 端点——“这位客户从哪里来？”的答案就落在记录旁边，而不是另一个面板里。
+此 connector 读取已存储的首次触点和末次触点上下文，并为已配置的 Craft 表单、用户注册和 Commerce 事件构建规范 payload。它不判断是哪次营销活动导致了线索或成交。投递仍受下文记录的传输限制约束。
 
-这里从不重复实现归因逻辑；每个 payload 都由共享内核 [`clicktrail/php-sdk`](https://github.com/vizuh/clicktrail-php) 计算。
+这里不重复实现归因逻辑。每个 payload 都由共享内核 [`clicktrail/php-sdk`](https://github.com/vizuh/clicktrail-php) 计算。
 
 需要 Craft CMS 5.0+ 和 PHP 8.2+。可选：Craft Forms 插件（表单提交）与 Craft Commerce（订单）。
 
@@ -51,7 +51,7 @@ php craft plugin/install clicktrail
 
 ```twig
 {{ clicktrail.attribution.first.source }}
-{# 付费搜索落地后立即是 "google" ——
+{# 付费搜索落地后立即是 "google" ；
    之后无论多少次直接访问，依然是 "google" #}
 
 <pre>{{ clicktrail.payload('page_view') | json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
@@ -59,7 +59,7 @@ php craft plugin/install clicktrail
    包含同意快照。当分析类同意为 unknown/denied 时渲染 []。 #}
 ```
 
-一位访客从 Google Ads 广告进入，完成注册，然后下了 Commerce 订单。你的 ClickTrail 端点会收到三个规范化事件——`lead_created`、`lead_created`、`sale`——每个都盖有同一个不可变的首次触点（`attribution.first.source === 'google'`，点击 ID 保留），并附带事件发生时的末次触点。
+从到达到注册再到 Commerce 订单的已配置路径可以构建三个规范事件：`lead_created`、`lead_created` 和 `sale`。每个 payload 都包含观测到的首次触点和事件发生时的末次触点。投递是否成功取决于已配置的端点和下文记录的传输限制。
 
 ## 事件映射
 
@@ -94,7 +94,7 @@ php craft plugin/install clicktrail
 
 ## 同意状态
 
-ClickTrail 不取代你的同意管理平台——它服从该平台。规范化的同意契约（能力、快照结构、行为矩阵）见 [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md)。
+ClickTrail 不取代你的同意管理平台；它服从该平台。规范化的同意契约（能力、快照结构、行为矩阵）见 [`docs/consent-compatibility-plan.md`](../../docs/consent-compatibility-plan.md)。
 
 - 提供方：实现 `ClickTrail\Craft\Services\Consent\ConsentResolverInterface`（返回当前 `ClickTrail\Consent\ConsentSnapshot`），并将插件设置指向该实现。真正的 CMP 适配器暂缓；WordPress 插件直接读取 WP Consent API。
 - 同意状态未知时：**不存储、不发送**。被抑制的操作会通过 `suppressionReason()` 记录到诊断信息中。
@@ -118,4 +118,4 @@ GitHub Actions CI 在每次推送时对所有 PHP 文件执行 lint（[workflow]
 
 ## 许可协议
 
-MIT — Copyright (c) 2026 Vizuh OÜ。详见 [LICENSE](LICENSE)。
+MIT; Copyright (c) 2026 Vizuh OÜ。详见 [LICENSE](LICENSE)。
