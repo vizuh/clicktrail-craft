@@ -59,7 +59,7 @@ php craft plugin/install clicktrail
    包含同意快照。当分析类同意为 unknown/denied 时渲染 []。 #}
 ```
 
-一位访客从 Google Ads 广告进入，完成注册，然后下了 Commerce 订单。你的 ClickTrail 端点会收到三个规范化事件——`lead.submitted`、`lead.submitted`、`sale.completed`——每个都盖有同一个不可变的首次触点（`attribution.first.source === 'google'`，点击 ID 保留），并附带事件发生时的末次触点。
+一位访客从 Google Ads 广告进入，完成注册，然后下了 Commerce 订单。你的 ClickTrail 端点会收到三个规范化事件——`lead_created`、`lead_created`、`sale`——每个都盖有同一个不可变的首次触点（`attribution.first.source === 'google'`，点击 ID 保留），并附带事件发生时的末次触点。
 
 ## 事件映射
 
@@ -67,10 +67,10 @@ php craft plugin/install clicktrail
 
 | Craft 事件 | ClickTrail 事件 |
 |---|---|
-| 表单提交（Forms 插件） | `lead.submitted` |
-| 用户注册 | `lead.submitted` |
-| Commerce 订单完成 | `sale.completed` |
-| Commerce 订单退款 | `sale.refunded` |
+| 表单提交（Forms 插件） | `lead_created` |
+| 用户注册 | `lead_created` |
+| Commerce 订单完成 | `sale` |
+| Commerce 订单退款 | `refund` |
 
 每个映射都可以在设置中单独关闭。
 
@@ -87,10 +87,10 @@ php craft plugin/install clicktrail
 | 广告点击 ID 存储需要 `advertising_storage` | 开启 | 未获得广告类同意时，将 gclid/fbclid/... 从存储中剔除 |
 | 向广告目标发送哈希线索数据（`ad_user_data`） | 关闭 | 哈希线索转发的额外闸门；仍需获得 `ad_user_data` 授权 |
 | 第一方代理 | 关闭 | 从你自己的域名提供 ClickTrail 加载器 |
-| 映射表单提交 | 开启 | 表单提交时发出 `lead.submitted` |
-| 映射用户注册 | 开启 | 注册时发出 `lead.submitted` |
-| 映射 Commerce 订单 | 开启 | 订单完成时发出 `sale.completed` |
-| 映射退款 | 开启 | 发出 `sale.refunded` |
+| 映射表单提交 | 开启 | 表单提交时发出 `lead_created` |
+| 映射用户注册 | 开启 | 注册时发出 `lead_created` |
+| 映射 Commerce 订单 | 开启 | 订单完成时发出 `sale` |
+| 映射退款 | 开启 | 发出 `refund` |
 
 ## 同意状态
 

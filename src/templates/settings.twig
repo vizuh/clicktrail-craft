@@ -67,28 +67,28 @@
 <h2>{{ 'Event mapping'|t('clicktrail') }}</h2>
 
 {{ forms.lightswitchField({
-    label: 'Form submissions → lead.submitted'|t('clicktrail'),
+    label: 'Form submissions → lead_created'|t('clicktrail'),
     id: 'mapFormSubmissions',
     name: 'mapFormSubmissions',
     on: settings.mapFormSubmissions,
 }) }}
 
 {{ forms.lightswitchField({
-    label: 'User registrations → lead.submitted'|t('clicktrail'),
+    label: 'User registrations → lead_created'|t('clicktrail'),
     id: 'mapUserRegistrations',
     name: 'mapUserRegistrations',
     on: settings.mapUserRegistrations,
 }) }}
 
 {{ forms.lightswitchField({
-    label: 'Commerce orders completed → sale.completed'|t('clicktrail'),
+    label: 'Commerce orders completed → sale'|t('clicktrail'),
     id: 'mapCommerceOrders',
     name: 'mapCommerceOrders',
     on: settings.mapCommerceOrders,
 }) }}
 
 {{ forms.lightswitchField({
-    label: 'Order refunds → sale.refunded'|t('clicktrail'),
+    label: 'Order refunds → refund'|t('clicktrail'),
     id: 'mapRefunds',
     name: 'mapRefunds',
     on: settings.mapRefunds,

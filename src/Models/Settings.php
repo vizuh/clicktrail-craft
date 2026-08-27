@@ -40,10 +40,10 @@ class Settings extends Model
     public bool $firstPartyProxy = false;
 
     /** Which platform events map to which ClickTrail events. */
-    public bool $mapFormSubmissions = true;   // form submit      -> lead.submitted
-    public bool $mapUserRegistrations = true; // registration     -> lead.submitted
-    public bool $mapCommerceOrders = true;    // order completed  -> sale.completed
-    public bool $mapRefunds = true;           // order refunded   -> sale.refunded
+    public bool $mapFormSubmissions = true;   // form submit      -> lead_created
+    public bool $mapUserRegistrations = true; // registration     -> lead_created
+    public bool $mapCommerceOrders = true;    // order completed  -> sale
+    public bool $mapRefunds = true;           // order refunded   -> refund
 
     public function defineRules(): array
     {
@@ -64,9 +64,9 @@ class Settings extends Model
     public function eventMap(): array
     {
         return [
-            'lead.submitted' => $this->mapFormSubmissions || $this->mapUserRegistrations,
-            'sale.completed' => $this->mapCommerceOrders,
-            'sale.refunded' => $this->mapRefunds,
+            'lead_created' => $this->mapFormSubmissions || $this->mapUserRegistrations,
+            'sale' => $this->mapCommerceOrders,
+            'refund' => $this->mapRefunds,
         ];
     }
 }

@@ -59,7 +59,7 @@ Read attribution directly in any site template:
    consent snapshot included. Renders [] when analytics consent is unknown/denied. #}
 ```
 
-A visitor arrives from a Google Ads ad, registers, then completes a Commerce order. Your ClickTrail endpoint receives three canonical events — `lead.submitted`, `lead.submitted`, `sale.completed` — each stamped with the same immutable first touch (`attribution.first.source === 'google'`, click ID preserved) plus the last touch at event time.
+A visitor arrives from a Google Ads ad, registers, then completes a Commerce order. Your ClickTrail endpoint receives three canonical events — `lead_created`, `lead_created`, `sale` — each stamped with the same immutable first touch (`attribution.first.source === 'google'`, click ID preserved) plus the last touch at event time.
 
 ## Event mapping
 
@@ -67,10 +67,10 @@ Platform-native events map onto canonical ClickTrail events:
 
 | Craft event | ClickTrail event |
 |---|---|
-| Form submit (Forms plugin) | `lead.submitted` |
-| User registration | `lead.submitted` |
-| Commerce order completed | `sale.completed` |
-| Commerce order refunded | `sale.refunded` |
+| Form submit (Forms plugin) | `lead_created` |
+| User registration | `lead_created` |
+| Commerce order completed | `sale` |
+| Commerce order refunded | `refund` |
 
 Each mapping can be switched off individually in the settings.
 
@@ -87,10 +87,10 @@ All options live on the plugin settings page (Settings → ClickTrail):
 | Ad click-ID storage requires `advertising_storage` | on | Strip gclid/fbclid/... from storage without advertising consent |
 | Send hashed lead data to ad destinations (`ad_user_data`) | off | Extra gate for hashed-lead forwarding; still needs `ad_user_data` granted |
 | First-party proxy | off | Serve the ClickTrail loader from your own domain |
-| Map form submissions | on | Emit `lead.submitted` on form submits |
-| Map user registrations | on | Emit `lead.submitted` on registration |
-| Map Commerce orders | on | Emit `sale.completed` on order completion |
-| Map refunds | on | Emit `sale.refunded` |
+| Map form submissions | on | Emit `lead_created` on form submits |
+| Map user registrations | on | Emit `lead_created` on registration |
+| Map Commerce orders | on | Emit `sale` on order completion |
+| Map refunds | on | Emit `refund` |
 
 ## Consent
 

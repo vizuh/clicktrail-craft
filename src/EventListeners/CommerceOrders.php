@@ -8,7 +8,7 @@ use ClickTrail\Conventions\Stable;
 use craft\commerce\elements\Order;
 
 /**
- * Commerce order lifecycle -> sale.completed / sale.refunded.
+ * Commerce order lifecycle -> sale / refund.
  */
 class CommerceOrders
 {
@@ -38,7 +38,7 @@ class CommerceOrders
 
     public static function onOrderComplete(\yii\base\Event $event): void
     {
-        self::emitForOrder(Stable::EVENT_SALE_COMPLETED, 'mapCommerceOrders', $event);
+        self::emitForOrder(Stable::EVENT_SALE, 'mapCommerceOrders', $event);
     }
 
     public static function onTransactionSave(\yii\base\Event $event): void
@@ -53,7 +53,7 @@ class CommerceOrders
         // (TransactionRecord::TYPE_REFUND); confirm before first release.
         $type = (string) ($transaction->type ?? '');
         if ($type === 'refund') {
-            self::emitForOrder(Stable::EVENT_SALE_REFUNDED, 'mapRefunds', $event);
+            self::emitForOrder(Stable::EVENT_REFUND, 'mapRefunds', $event);
         }
     }
 

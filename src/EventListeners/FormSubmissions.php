@@ -8,7 +8,7 @@ use Craft;
 use ClickTrail\Conventions\Stable;
 
 /**
- * Form submission -> lead.submitted.
+ * Form submission -> lead_created.
  *
  * Targets the native Craft Forms plugin. The exact event interface and
  * namespace must be confirmed against the installed Forms plugin version.
@@ -50,12 +50,12 @@ class FormSubmissions
 
         // Delivery is delegated to the SDK client; wire endpoint transport here.
         $payload = $plugin->get('attribution')->buildPayload(
-            Stable::EVENT_LEAD_SUBMITTED,
+            Stable::EVENT_LEAD_CREATED,
             event: [],
             extra: $extra,
         );
 
-        Craft::debug('ClickTrail lead.submitted payload built', __METHOD__);
+        Craft::debug('ClickTrail lead_created payload built', __METHOD__);
         Delivery::send($payload);
     }
 }

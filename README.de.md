@@ -59,7 +59,7 @@ Lesen Sie die Attribution direkt in jedem Site-Template:
    Consent-Snapshot inklusive. Rendert [], wenn Analytics-Consent unknown/denied ist. #}
 ```
 
-Ein Besucher kommt über eine Google-Ads-Anzeige, registriert sich und schließt eine Commerce-Bestellung ab. Ihr ClickTrail-Endpoint erhält drei kanonische Events — `lead.submitted`, `lead.submitted`, `sale.completed` — jedes gestempelt mit demselben unveränderlichen First Touch (`attribution.first.source === 'google'`, Click-ID erhalten) plus dem Last Touch zum Event-Zeitpunkt.
+Ein Besucher kommt über eine Google-Ads-Anzeige, registriert sich und schließt eine Commerce-Bestellung ab. Ihr ClickTrail-Endpoint erhält drei kanonische Events — `lead_created`, `lead_created`, `sale` — jedes gestempelt mit demselben unveränderlichen First Touch (`attribution.first.source === 'google'`, Click-ID erhalten) plus dem Last Touch zum Event-Zeitpunkt.
 
 ## Event-Mapping
 
@@ -67,10 +67,10 @@ Plattformnative Events werden auf kanonische ClickTrail-Events abgebildet:
 
 | Craft-Event | ClickTrail-Event |
 |---|---|
-| Formular-Übermittlung (Forms-Plugin) | `lead.submitted` |
-| Benutzerregistrierung | `lead.submitted` |
-| Commerce-Bestellung abgeschlossen | `sale.completed` |
-| Commerce-Bestellung erstattet | `sale.refunded` |
+| Formular-Übermittlung (Forms-Plugin) | `lead_created` |
+| Benutzerregistrierung | `lead_created` |
+| Commerce-Bestellung abgeschlossen | `sale` |
+| Commerce-Bestellung erstattet | `refund` |
 
 Jedes Mapping lässt sich in den Einstellungen einzeln abschalten.
 
@@ -87,10 +87,10 @@ Alle Optionen finden Sie auf der Plugin-Einstellungsseite (Einstellungen → Cli
 | Click-ID-Speicherung erfordert `advertising_storage` | an | gclid/fbclid/... ohne Advertising-Consent aus der Speicherung entfernen |
 | Gehashte Lead-Daten an Ad-Ziele senden (`ad_user_data`) | aus | Zusätzliche Schranke für das Weiterleiten gehashter Lead-Daten; erfordert weiterhin erteiltes `ad_user_data` |
 | First-Party-Proxy | aus | ClickTrail-Loader von Ihrer eigenen Domain ausliefern |
-| Formular-Übermittlungen mappen | an | `lead.submitted` bei Formular-Übermittlungen ausgeben |
-| Benutzerregistrierungen mappen | an | `lead.submitted` bei Registrierung ausgeben |
-| Commerce-Bestellungen mappen | an | `sale.completed` beim Abschluss einer Bestellung ausgeben |
-| Erstattungen mappen | an | `sale.refunded` ausgeben |
+| Formular-Übermittlungen mappen | an | `lead_created` bei Formular-Übermittlungen ausgeben |
+| Benutzerregistrierungen mappen | an | `lead_created` bei Registrierung ausgeben |
+| Commerce-Bestellungen mappen | an | `sale` beim Abschluss einer Bestellung ausgeben |
+| Erstattungen mappen | an | `refund` ausgeben |
 
 ## Consent
 

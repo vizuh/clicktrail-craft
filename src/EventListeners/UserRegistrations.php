@@ -10,7 +10,7 @@ use yii\base\Event;
 use craft\events\ModelEvent;
 
 /**
- * User registration -> lead.submitted.
+ * User registration -> lead_created.
  */
 class UserRegistrations
 {
@@ -36,7 +36,7 @@ class UserRegistrations
         $user = $event->sender;
 
         $payload = $plugin->get('attribution')->buildPayload(
-            Stable::EVENT_LEAD_SUBMITTED,
+            Stable::EVENT_LEAD_CREATED,
             event: [],
             extra: [
                 'object_type' => 'user',

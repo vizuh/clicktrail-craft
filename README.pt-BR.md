@@ -60,7 +60,7 @@ Leia a atribuição diretamente em qualquer template do site:
    de analytics está unknown/denied. #}
 ```
 
-Um visitante chega por um anúncio do Google Ads, se registra e conclui um pedido no Commerce. Seu endpoint ClickTrail recebe três eventos canônicos — `lead.submitted`, `lead.submitted`, `sale.completed` — cada um carimbado com o mesmo primeiro toque imutável (`attribution.first.source === 'google'`, click ID preservado) mais o último toque no momento do evento.
+Um visitante chega por um anúncio do Google Ads, se registra e conclui um pedido no Commerce. Seu endpoint ClickTrail recebe três eventos canônicos — `lead_created`, `lead_created`, `sale` — cada um carimbado com o mesmo primeiro toque imutável (`attribution.first.source === 'google'`, click ID preservado) mais o último toque no momento do evento.
 
 ## Mapeamento de eventos
 
@@ -68,10 +68,10 @@ Eventos nativos da plataforma são mapeados para eventos canônicos ClickTrail:
 
 | Evento Craft | Evento ClickTrail |
 |---|---|
-| Envio de formulário (plugin Forms) | `lead.submitted` |
-| Registro de usuário | `lead.submitted` |
-| Pedido Commerce concluído | `sale.completed` |
-| Pedido Commerce reembolsado | `sale.refunded` |
+| Envio de formulário (plugin Forms) | `lead_created` |
+| Registro de usuário | `lead_created` |
+| Pedido Commerce concluído | `sale` |
+| Pedido Commerce reembolsado | `refund` |
 
 Cada mapeamento pode ser desligado individualmente nas configurações.
 
@@ -88,10 +88,10 @@ Todas as opções ficam na página de configurações do plugin (Configurações
 | Click IDs exigem `advertising_storage` | ligado | Remover gclid/fbclid/... do armazenamento sem consentimento de publicidade |
 | Enviar dados de lead com hash a destinos de anúncios (`ad_user_data`) | desligado | Portão extra para encaminhamento de leads com hash; ainda exige `ad_user_data` concedido |
 | Proxy first-party | desligado | Servir o loader ClickTrail pelo seu próprio domínio |
-| Mapear envios de formulário | ligado | Emitir `lead.submitted` em envios de formulário |
-| Mapear registros de usuário | ligado | Emitir `lead.submitted` no registro |
-| Mapear pedidos do Commerce | ligado | Emitir `sale.completed` na conclusão do pedido |
-| Mapear reembolsos | ligado | Emitir `sale.refunded` |
+| Mapear envios de formulário | ligado | Emitir `lead_created` em envios de formulário |
+| Mapear registros de usuário | ligado | Emitir `lead_created` no registro |
+| Mapear pedidos do Commerce | ligado | Emitir `sale` na conclusão do pedido |
+| Mapear reembolsos | ligado | Emitir `refund` |
 
 ## Consentimento
 
