@@ -1,6 +1,6 @@
 {
     "name": "vizuh/craft-clicktrail",
-    "description": "Attribution connector for Craft Forms and Commerce - see which campaign, keyword, click ID and landing page created each submission, customer and order.",
+    "description": "Carry observed acquisition context into configured Craft Forms, user, and Commerce event payloads.",
     "type": "craft-plugin",
     "license": "MIT",
     "keywords": [
