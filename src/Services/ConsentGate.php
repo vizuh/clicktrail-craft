@@ -51,8 +51,24 @@ final class ConsentGate
             return null;
         }
         $json = $session->get(self::SESSION_SNAPSHOT_KEY);
+        if (!is_string($json)) {
+            return null;
+        }
 
-        return $json === null ? null : ConsentSnapshot::fromJson((string) $json);
+        // The SDK only offers fromArray(); anything that is not a decodable
+        // JSON object degrades to "no snapshot" instead of a fatal.
+        $data = json_decode($json, true);
+        if (!is_array($data) || array_is_list($data)) {
+            return null;
+        }
+
+        try {
+            return ConsentSnapshot::fromArray($data);
+        } catch (\Throwable $e) {
+            Craft::warning('ClickTrail stored consent snapshot is invalid: ' . $e->getMessage(), __METHOD__);
+
+            return null;
+        }
     }
 
     /**
